@@ -33,6 +33,7 @@ public class Server {
             try {
                 Socket socket = serverSocket.accept();
                 Connection connection = new Connection(socket);
+                connection.start();
                 connections.add(connection);
                 System.out.println(socket.getRemoteSocketAddress() + " 이(가) 연결되었습니다.");
             } catch (Exception e) {
