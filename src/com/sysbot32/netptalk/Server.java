@@ -4,6 +4,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -13,6 +14,7 @@ public class Server {
     private ExecutorService executorService;
 
     public Server(int port) {
+        System.out.println("서버를 생성합니다.");
         try {
             serverSocket = new ServerSocket(port);
         } catch (Exception e) {
@@ -20,12 +22,15 @@ public class Server {
         }
         connections = new ArrayList<>();
         executorService = Executors.newSingleThreadExecutor();
-        System.out.println("서버를 생성했습니다.");
     }
 
     public void start() {
+        System.out.println("서버를 시작합니다.");
+        if (Objects.isNull(serverSocket)) {
+            System.out.println("서버를 시작할 수 없습니다.");
+            return;
+        }
         executorService.submit(this::accepting);
-        System.out.println("서버를 시작했습니다.");
     }
 
     private void accepting() {
