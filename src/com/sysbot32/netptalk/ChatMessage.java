@@ -4,27 +4,27 @@ import org.json.JSONObject;
 
 public class ChatMessage {
     private String type = "chat";
-    private String chatType;
+    private ChatType chatType;
     private String sender;
     private String content;
 
-    public ChatMessage(String chatType, String sender, String content) {
+    public ChatMessage(ChatType chatType, String sender, String content) {
         this.chatType = chatType;
         this.sender = sender;
         this.content = content;
     }
 
     public ChatMessage(JSONObject jsonObject) {
-        chatType = jsonObject.getString("chatType");
+        chatType = ChatType.valueOf(jsonObject.getString("chatType"));
         sender = jsonObject.getString("user");
         content = jsonObject.getString("content");
     }
 
-    public String getChatType() {
+    public ChatType getChatType() {
         return chatType;
     }
 
-    public void setChatType(String chatType) {
+    public void setChatType(ChatType chatType) {
         this.chatType = chatType;
     }
 
@@ -47,7 +47,7 @@ public class ChatMessage {
     public String toJSON() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", type);
-        jsonObject.put("chatType", chatType);
+        jsonObject.put("chatType", chatType.toString());
         jsonObject.put("sender", sender);
         jsonObject.put("content", content);
         return jsonObject.toString();
