@@ -64,6 +64,7 @@ public class Connection {
             if (Objects.isNull(received)) {
                 break;
             }
+            System.out.println(received);
             JSONObject jsonObject = new JSONObject(received);
             String type = jsonObject.getString("type");
             if (type.equals("chat")) {
