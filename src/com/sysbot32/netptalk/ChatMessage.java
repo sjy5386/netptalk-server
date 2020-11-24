@@ -7,17 +7,20 @@ public class ChatMessage {
     private ChatType chatType;
     private String sender;
     private String content;
+    private String chatRoom;
 
-    public ChatMessage(ChatType chatType, String sender, String content) {
+    public ChatMessage(ChatType chatType, String sender, String content, String chatRoom) {
         this.chatType = chatType;
         this.sender = sender;
         this.content = content;
+        this.chatRoom = chatRoom;
     }
 
     public ChatMessage(JSONObject jsonObject) {
         chatType = ChatType.valueOf(jsonObject.getString("chatType"));
         sender = jsonObject.getString("user");
         content = jsonObject.getString("content");
+        chatRoom = jsonObject.getString("chatRoom");
     }
 
     public ChatType getChatType() {
@@ -44,12 +47,21 @@ public class ChatMessage {
         this.content = content;
     }
 
+    public String getChatRoom() {
+        return chatRoom;
+    }
+
+    public void setChatRoom(String chatRoom) {
+        this.chatRoom = chatRoom;
+    }
+
     public String toJSON() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", type);
         jsonObject.put("chatType", chatType.toString());
         jsonObject.put("sender", sender);
         jsonObject.put("content", content);
+        jsonObject.put("chatRoom", chatRoom);
         return jsonObject.toString();
     }
 
