@@ -1,10 +1,13 @@
 package com.sysbot32.netptalk;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,9 +17,11 @@ public class Connection {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private ExecutorService executorService;
+    private Server server;
 
-    public Connection(Socket socket) throws Exception {
+    public Connection(Socket socket, Server server) throws Exception {
         this.socket = socket;
+        this.server = server;
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         executorService = Executors.newSingleThreadExecutor();
@@ -51,7 +56,16 @@ public class Connection {
 
     private void reading() {
         while (true) {
-            System.out.println(read());
+            String received = read();
+            JSONObject jsonObject = new JSONObject(received);
+            String type = jsonObject.getString("type");
+            if (type.equals("chat")) {
+                ChatMessage chatMessage = new ChatMessage(jsonObject);
+                List<Connection> connections = server.getConnections();
+                for (Connection connection : connections) {
+                    connection.write(received);
+                }
+            }
         }
     }
 

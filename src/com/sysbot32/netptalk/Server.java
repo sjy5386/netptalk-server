@@ -3,6 +3,7 @@ package com.sysbot32.netptalk;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +21,7 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        connections = new ArrayList<>();
+        connections = Collections.synchronizedList(new ArrayList<Connection>());
         executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -37,7 +38,7 @@ public class Server {
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
-                Connection connection = new Connection(socket);
+                Connection connection = new Connection(socket, this);
                 connection.start();
                 connections.add(connection);
                 System.out.println(socket.getRemoteSocketAddress() + " 이(가) 연결되었습니다.");
@@ -45,5 +46,9 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    public List<Connection> getConnections() {
+        return connections;
     }
 }
