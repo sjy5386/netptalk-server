@@ -13,6 +13,7 @@ public class Server {
     private ServerSocket serverSocket;
     private List<Connection> connections;
     private ExecutorService executorService;
+    private List<ChatRoom> chatRooms;
 
     public Server(int port) {
         System.out.println("서버를 생성합니다.");
@@ -21,8 +22,9 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        connections = Collections.synchronizedList(new ArrayList<Connection>());
+        connections = Collections.synchronizedList(new ArrayList<>());
         executorService = Executors.newSingleThreadExecutor();
+        chatRooms = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void start() {
@@ -48,7 +50,17 @@ public class Server {
         }
     }
 
+    public void send(String str) {
+        for (Connection connection : connections) {
+            connection.write(str);
+        }
+    }
+
     public List<Connection> getConnections() {
         return connections;
+    }
+
+    public List<ChatRoom> getChatRooms() {
+        return chatRooms;
     }
 }

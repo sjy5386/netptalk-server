@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -17,7 +18,9 @@ public class Connection {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private ExecutorService executorService;
+    private SocketAddress socketAddress;
     private Server server;
+    private String username;
 
     public Connection(Socket socket, Server server) throws Exception {
         this.socket = socket;
@@ -25,6 +28,7 @@ public class Connection {
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         executorService = Executors.newSingleThreadExecutor();
+        socketAddress = socket.getRemoteSocketAddress();
     }
 
     private String read() {
@@ -57,19 +61,52 @@ public class Connection {
     private void reading() {
         while (true) {
             String received = read();
+            if (Objects.isNull(received)) {
+                break;
+            }
             JSONObject jsonObject = new JSONObject(received);
             String type = jsonObject.getString("type");
             if (type.equals("chat")) {
                 ChatMessage chatMessage = new ChatMessage(jsonObject);
-                List<Connection> connections = server.getConnections();
-                for (Connection connection : connections) {
-                    connection.write(received);
+                System.out.println(chatMessage);
+                List<ChatRoom> chatRooms = server.getChatRooms();
+                for (ChatRoom chatRoom : chatRooms) {
+                    if (chatRoom.getTitle().equals(chatMessage.getChatRoom())) {
+                        chatRoom.getChatMessages().add(chatMessage);
+                        break;
+                    }
                 }
+                server.send(received);
+            } else if (type.equals("chatRoom")) {
+                ChatRoom chatRoom = new ChatRoom(jsonObject.getString("title"));
+                if (jsonObject.getString("action").equals("add")) {
+                    server.getChatRooms().add(chatRoom);
+                    server.send(chatRoom.toJSON());
+                }
+            } else if (type.equals("login")) {
+                username = jsonObject.getString("username");
+                System.out.println(username + "님이 로그인했습니다.");
             }
         }
+        disconnect();
     }
 
     public void start() {
         executorService.submit(this::reading);
+    }
+
+    public void disconnect() {
+        System.out.println(socketAddress + " 연결을 해제합니다.");
+        try {
+            bufferedReader.close();
+            bufferedWriter.close();
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        bufferedReader = null;
+        bufferedWriter = null;
+        socket = null;
+        server.getConnections().remove(this);
     }
 }
