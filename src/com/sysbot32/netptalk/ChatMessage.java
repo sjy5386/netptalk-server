@@ -4,39 +4,39 @@ import org.json.JSONObject;
 
 public class ChatMessage {
     private String type = "chat";
-    private ChatType chatType;
-    private String sender;
+    private String chatType;
+    private String username;
     private String content;
     private String chatRoom;
 
-    public ChatMessage(ChatType chatType, String sender, String content, String chatRoom) {
+    public ChatMessage(String chatType, String username, String content, String chatRoom) {
         this.chatType = chatType;
-        this.sender = sender;
+        this.username = username;
         this.content = content;
         this.chatRoom = chatRoom;
     }
 
     public ChatMessage(JSONObject jsonObject) {
-        chatType = ChatType.valueOf(jsonObject.getString("chatType"));
-        sender = jsonObject.getString("user");
+        chatType = jsonObject.getString("chatType");
+        username = jsonObject.getString("username");
         content = jsonObject.getString("content");
         chatRoom = jsonObject.getString("chatRoom");
     }
 
-    public ChatType getChatType() {
+    public String getChatType() {
         return chatType;
     }
 
-    public void setChatType(ChatType chatType) {
+    public void setChatType(String chatType) {
         this.chatType = chatType;
     }
 
-    public String getSender() {
-        return sender;
+    public String getUsername() {
+        return username;
     }
 
     public void setUser(String sender) {
-        this.sender = sender;
+        this.username = sender;
     }
 
     public String getContent() {
@@ -58,8 +58,8 @@ public class ChatMessage {
     public String toJSON() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", type);
-        jsonObject.put("chatType", chatType.toString());
-        jsonObject.put("sender", sender);
+        jsonObject.put("chatType", chatType);
+        jsonObject.put("username", username);
         jsonObject.put("content", content);
         jsonObject.put("chatRoom", chatRoom);
         return jsonObject.toString();
@@ -67,6 +67,6 @@ public class ChatMessage {
 
     @Override
     public String toString() {
-        return sender + ": " + content;
+        return username + ": " + content;
     }
 }
