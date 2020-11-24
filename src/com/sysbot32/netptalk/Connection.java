@@ -82,7 +82,7 @@ public class Connection {
                 ChatRoom chatRoom = new ChatRoom(jsonObject.getString("title"));
                 if (jsonObject.getString("action").equals("add")) {
                     server.getChatRooms().add(chatRoom);
-                    server.send(chatRoom.toJSON());
+                    server.send(jsonObject.toString());
                 }
             } else if (type.equals("login")) {
                 username = jsonObject.getString("username");
