@@ -2,6 +2,7 @@ package com.sysbot32.netptalk;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 public class Server {
     private ServerSocket serverSocket;
@@ -15,6 +16,10 @@ public class Server {
     }
 
     public Connection accept() {
+        if (Objects.isNull(serverSocket)) {
+            return null;
+        }
+
         try {
             Socket socket = serverSocket.accept();
             return new Connection(socket);
