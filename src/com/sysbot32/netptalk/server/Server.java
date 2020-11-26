@@ -1,4 +1,4 @@
-package com.sysbot32.netptalk;
+package com.sysbot32.netptalk.server;
 
 import java.net.ServerSocket;
 import java.net.Socket;

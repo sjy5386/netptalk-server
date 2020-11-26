@@ -1,5 +1,7 @@
-package com.sysbot32.netptalk
+package com.sysbot32.netptalk.server
 
+import com.sysbot32.netptalk.ChatMessage
+import com.sysbot32.netptalk.ChatRoom
 import org.json.JSONObject
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
