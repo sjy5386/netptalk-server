@@ -39,13 +39,15 @@ public class Connection {
             return;
         }
 
-        try {
-            bufferedWriter.write(str);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new Thread(() -> {
+            try {
+                bufferedWriter.write(str);
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     public void disconnect() {
