@@ -36,7 +36,25 @@ class ChatServer(private val server: Server) {
         }
     }
 
-    private fun write(chatConnection: ChatConnection, str: String) {
+    fun write(chatConnection: ChatConnection, str: String) {
         chatConnection.connection.write(str)
+    }
+
+    fun findChatConnectionByUsername(username: String): ChatConnection? {
+        chatConnections.forEach {
+            if (it.username == username) {
+                return it
+            }
+        }
+        return null
+    }
+
+    fun findChatRoomByTitle(title: String): ChatRoom? {
+        chatRooms.forEach {
+            if (it.title == title) {
+                return it
+            }
+        }
+        return null
     }
 }

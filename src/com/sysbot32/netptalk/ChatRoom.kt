@@ -5,7 +5,7 @@ import org.json.JSONObject
 
 data class ChatRoom(var title: String) {
     private val type: String = "chatRoom"
-    private val users: MutableList<String> = mutableListOf()
+    val users: MutableList<String> = mutableListOf()
     val chatMessages: MutableList<ChatMessage> = mutableListOf()
 
     fun toJSONObject(): JSONObject {

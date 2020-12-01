@@ -8,7 +8,7 @@ import java.util.concurrent.Executors
 
 class ChatConnection(val connection: Connection, private val chatServer: ChatServer) {
     private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
-    private lateinit var username: String
+    lateinit var username: String
 
     fun start() {
         executorService.submit(this::reading)
@@ -33,17 +33,35 @@ class ChatConnection(val connection: Connection, private val chatServer: ChatSer
                     chatServer.write(received)
                 }
                 "chatRoom" -> {
-                    val chatRoom = ChatRoom(jsonObject.getString("title"))
-                    if (jsonObject.getString("action") == "add") {
-                        chatServer.chatRooms.add(chatRoom)
-                        chatServer.write(received)
+                    val title: String = jsonObject.getString("title")
+                    when (jsonObject.getString("action")) {
+                        "add" -> {
+                            chatServer.chatRooms.add(ChatRoom(title))
+                            chatServer.write(received)
+                        }
+                        "invite" -> {
+                            val chatRoom = chatServer.findChatRoomByTitle(title)
+                            if (chatRoom != null) {
+                                val invitee: String = jsonObject.getString("invitee")
+                                chatRoom.users.add(invitee)
+                                chatServer.findChatConnectionByUsername(invitee)?.let {
+                                    chatServer.write(it, received)
+                                }
+                            }
+                        }
+                        "leave" -> {
+                            val chatRoom = chatServer.findChatRoomByTitle(title)
+                            chatRoom?.users?.remove(jsonObject.getString("username"))
+                        }
                     }
                 }
                 "login" -> {
                     username = jsonObject.getString("username")
                     println("${username}님이 로그인했습니다.")
                     chatServer.chatRooms.forEach {
-                        connection.write(it.toJSONObject().put("action", "add").toString())
+                        if (it.users.contains(username)) {
+                            connection.write(it.toJSONObject().put("action", "add").toString())
+                        }
                     }
                 }
             }
