@@ -36,8 +36,10 @@ class ChatConnection(val connection: Connection, private val chatServer: ChatSer
                     val title: String = jsonObject.getString("title")
                     when (jsonObject.getString("action")) {
                         "add" -> {
-                            chatServer.chatRooms.add(ChatRoom(title))
-                            chatServer.write(received)
+                            val chatRoom = ChatRoom(title)
+                            chatServer.chatRooms.add(chatRoom)
+                            chatRoom.users.add(username)
+                            chatServer.write(this, received)
                         }
                         "invite" -> {
                             val chatRoom = chatServer.findChatRoomByTitle(title)
