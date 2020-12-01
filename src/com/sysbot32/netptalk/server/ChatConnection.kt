@@ -40,6 +40,9 @@ class ChatConnection(val connection: Connection, private val chatServer: ChatSer
             } else if (type == "login") {
                 username = jsonObject.getString("username")
                 println("${username}님이 로그인했습니다.")
+                chatServer.chatRooms.forEach {
+                    connection.write(it.toJSONObject().put("action", "add").toString())
+                }
             }
         }
         println("${connection.socketAddress}에서 연결을 해제합니다.")
