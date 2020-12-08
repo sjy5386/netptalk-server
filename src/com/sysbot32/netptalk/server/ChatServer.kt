@@ -37,7 +37,7 @@ class ChatServer(private val server: Server) {
     }
 
     fun write(chatConnection: ChatConnection, str: String) {
-        chatConnection.connection.write(str)
+        chatConnection.write(str)
     }
 
     fun findChatConnectionByUsername(username: String): ChatConnection? {

@@ -1,65 +1,66 @@
 package com.sysbot32.netptalk.server;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.Objects;
 
 public class Connection {
-    private Socket socket;
-    private BufferedReader bufferedReader;
-    private BufferedWriter bufferedWriter;
+    private SocketChannel socket;
     private SocketAddress socketAddress;
 
-    public Connection(Socket socket) throws Exception {
+    public Connection(SocketChannel socket) throws Exception {
         this.socket = socket;
-        bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        socketAddress = socket.getRemoteSocketAddress();
+        socketAddress = socket.socket().getRemoteSocketAddress();
     }
 
-    public String read() {
-        if (Objects.isNull(bufferedReader)) {
+    public ByteBuffer read() {
+        if (Objects.isNull(socket) || !socket.isConnected()) {
             return null;
         }
 
+        ByteBuffer buf = ByteBuffer.allocate(Integer.BYTES);
+        ByteBuffer data;
         try {
-            return bufferedReader.readLine();
+            if (socket.read(buf) < 0) {
+                return null;
+            }
+            buf.flip();
+            int size = buf.getInt();
+            data = ByteBuffer.allocate(size);
+            while (data.hasRemaining()) {
+                socket.read(data);
+            }
+            data.flip();
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
+        return data;
     }
 
-    public void write(String str) {
-        if (Objects.isNull(bufferedWriter)) {
+    public synchronized void write(ByteBuffer data) {
+        if (Objects.isNull(socket) || !socket.isConnected()) {
             return;
         }
 
-        new Thread(() -> {
-            try {
-                bufferedWriter.write(str);
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        int size = data.capacity();
+        ByteBuffer buf = ByteBuffer.allocate(Integer.BYTES + size);
+        buf.putInt(size);
+        buf.put(data);
+        buf.flip();
+        try {
+            socket.write(buf);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void disconnect() {
         try {
-            bufferedReader.close();
-            bufferedWriter.close();
             socket.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        bufferedReader = null;
-        bufferedWriter = null;
         socket = null;
     }
 
