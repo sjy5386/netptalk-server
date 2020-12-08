@@ -37,14 +37,6 @@ class ChatConnection(val connection: Connection, private val chatServer: ChatSer
             when (jsonObject.getString("type")) {
                 "chat" -> {
                     val chatMessage = ChatMessage(jsonObject)
-                    run {
-                        chatServer.chatRooms.forEach {
-                            if (it.title == chatMessage.chatRoom) {
-                                it.chatMessages.add(chatMessage)
-                                return@run
-                            }
-                        }
-                    }
                     chatServer.write(received)
                 }
                 "chatRoom" -> {
@@ -75,11 +67,6 @@ class ChatConnection(val connection: Connection, private val chatServer: ChatSer
                 "login" -> {
                     username = jsonObject.getString("username")
                     println("${username}님이 로그인했습니다.")
-                    chatServer.chatRooms.forEach {
-                        if (it.users.contains(username)) {
-                            write(it.toJSONObject().put("action", "add").toString())
-                        }
-                    }
                 }
             }
         }
