@@ -1,8 +1,10 @@
 package com.sysbot32.netptalk.server
 
+import com.sysbot32.netptalk.ChatFile
 import com.sysbot32.netptalk.ChatMessage
 import com.sysbot32.netptalk.ChatRoom
 import org.json.JSONObject
+import java.io.File
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ExecutorService
@@ -67,6 +69,13 @@ class ChatConnection(val connection: Connection, private val chatServer: ChatSer
                 "login" -> {
                     username = jsonObject.getString("username")
                     println("${username}님이 로그인했습니다.")
+                }
+                "file" -> {
+                    ChatFile(jsonObject).write()
+                }
+                "requestFile" -> {
+                    val filename: String = jsonObject.getString("filename")
+                    write(ChatFile(File(filename)).toJSONObject().toString())
                 }
             }
         }

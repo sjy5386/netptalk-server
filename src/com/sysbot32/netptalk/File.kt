@@ -21,6 +21,10 @@ data class ChatFile(val filename: String, val data: ByteArray) {
         writeFile(File(filename), data)
     }
 
+    fun toJSONObject(): JSONObject = JSONObject()
+            .put("filename", filename)
+            .put("data", Base64.getEncoder().encode(data))
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
