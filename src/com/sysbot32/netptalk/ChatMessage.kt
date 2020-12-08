@@ -2,14 +2,22 @@ package com.sysbot32.netptalk
 
 import org.json.JSONObject
 
-data class ChatMessage(var chatType: String, var username: String, var content: String, var chatRoom: String) {
-    private val type: String = "type"
+data class ChatMessage(
+        val chatType: String,
+        val username: String,
+        val content: String,
+        val chatRoom: String,
+        val timestamp: Long
+) {
+    private val type: String = "chat"
 
     constructor(jsonObject: JSONObject) : this(
             jsonObject.getString("chatType"),
             jsonObject.getString("username"),
             jsonObject.getString("content"),
-            jsonObject.getString("chatRoom"))
+            jsonObject.getString("chatRoom"),
+            jsonObject.getLong("timestamp")
+    )
 
     fun toJSONObject(): JSONObject {
         return JSONObject()
@@ -18,6 +26,7 @@ data class ChatMessage(var chatType: String, var username: String, var content: 
                 .put("username", username)
                 .put("content", content)
                 .put("chatRoom", chatRoom)
+                .put("timestamp", timestamp)
     }
 
     override fun toString(): String {
