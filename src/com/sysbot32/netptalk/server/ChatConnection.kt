@@ -73,6 +73,14 @@ class ChatConnection(val connection: Connection, private val chatServer: ChatSer
                     Thread() {
                         ChatFile(jsonObject).write()
                     }.start()
+                    chatServer.write(JSONObject()
+                            .put("type", "chat")
+                            .put("username", jsonObject.getString("username"))
+                            .put("chatType", "file")
+                            .put("content", jsonObject.getString("filename"))
+                            .put("chatRoom", jsonObject.getString("chatRoom"))
+                            .put("timestamp", jsonObject.getLong("timestamp"))
+                            .toString())
                 }
                 "requestFile" -> {
                     val filename: String = jsonObject.getString("filename")
